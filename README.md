@@ -37,6 +37,21 @@ Pebble Time and Time Round show place info as text (no photos) and places as dot
 Maps Static API (map pictures), Places API (New) (search, places on the map, info and photos),
 Routes API (directions), Geocoding API (addresses), Cloud Text-to-Speech (spoken directions). Your key is stored only on your phone and sent only to Google.
 
+## API
+
+Other apps on the phone can drive Pebble Maps by sending AppMessages to the watch app
+(UUID `cce60bc9-e29f-4988-a83b-b4652291650d`). They use the same `cmd` convention as the
+app's own messages, with the keys from `package.json` (`cmd` = 10000, `mode` = 10003,
+`text` = 10004):
+
+| `cmd` | Name | Keys | What happens |
+|---|---|---|---|
+| 120 | API_SEARCH | `text`: the query | Shows the results for `text`, as if it had been spoken into voice search. A search ends navigation. |
+| 121 | API_NAVIGATE | `text`: the name of a favorite, an address, a place name or `lat,lng`; `mode` (optional): 0 drive, 1 walk, 2 bike, 3 transit | Starts turn-by-turn directions straight away, replacing any navigation already running. Without `mode`, the favorite's travel mode, or else the default from Settings. |
+
+A typical caller launches the app, sends an empty message until it is acknowledged, then sends
+its command. Problems (no Google key, a place that can't be found) show on the watch as usual.
+
 ## Development
 
 `npm test` runs the phone regression tests and native C queue/speaker tests (Node 22+, Python 3 and GCC).
